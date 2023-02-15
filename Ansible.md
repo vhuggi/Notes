@@ -72,6 +72,54 @@ Example task2:
 
 Handles are a special type of tasks. They can be defined like a regular task but they'll be executed only if there is a change noticed in one of the tasks where `notify` is used 
 
+An example of a handler being used in a playbook:
+
+```yaml
+tasks:
+  - name: update configuration file
+    copy:
+      src: files/config.conf
+      dest: /etc/myapp/config.conf
+    notify: restart myapp service
+
+handlers:
+  - name: restart myapp service
+    service:
+      name: myapp
+      state: restarted
+```
+
+### Using Roles
+
+Roles are a way to organize and package multiple tasks, handlers, and other files into reusable components. Roles can be thought of as building blocks for playbooks, allowing you to abstract common tasks and configurations into separate components that can be shared and reused.
+
+Roles are defined in a specific directory structure and can include tasks, handlers, files, templates, and other resources. A typical directory structure for a role looks like this:
+
+```yaml
+roles/
+  webserver/
+    tasks/
+      main.yml
+    handlers/
+      main.yml
+    files/
+      index.html
+    templates/
+      nginx.conf.j2
+```
+
+In this example, the "webserver" role includes a main task and handler file, as well as a file and template for configuring the nginx web server. This role can be included in a playbook by referencing the role directory:
+
+```yaml
+- name: install and configure web server
+  hosts: webservers
+  become: true
+  roles:
+    - webserver
+```
+
+This will include the tasks, handlers, and resources from the "webserver" role into the playbook, allowing you to easily reuse and share common configurations and tasks.
+
 ### Playbooks
 
 A list of tasks together is known as a Playbook. 
